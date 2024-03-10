@@ -4,14 +4,14 @@ import { cn } from "@/lib/utils";
 import Image from "next/image";
 
 export default function PetList() {
-  const { pets, handlePetSelect, selectedPetId } = usePetContext();
+  const { pets, setSelectedPetId, selectedPetId } = usePetContext();
 
   return (
     <ul className="bg-white border-b bg-black/[0.08]">
       {pets.map((pet) => (
         <li key={pet.id}>
           <button
-            onClick={() => handlePetSelect(pet.id)}
+            onClick={() => setSelectedPetId(pet.id)}
             className={cn(
               "flex items-center h-[70px] w-full cursor-pointer px-5 text-base gap-4 hover:bg-[#eff1f2] focus:bg-[#eff1f2] transition duration-300",
               { "bg-[#eff1f2]": selectedPetId === pet.id }
