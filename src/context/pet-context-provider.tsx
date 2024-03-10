@@ -11,6 +11,7 @@ type PetContextProviderProps = {
 type PetContextType = {
   pets: Pet[];
   selectedPetId: string | null;
+  numberOfpets: number;
   setSelectedPetId: React.Dispatch<React.SetStateAction<string | null>>;
   selectedPet: Pet | null;
 };
@@ -26,12 +27,19 @@ export default function PetContextProvider({
 
   // Derived state
   const selectedPet = pets.find((pet) => pet.id === selectedPetId);
+  const numberOfpets = pets.length;
 
-  // Event handlers
+  // Event handlers / Actions
 
   return (
     <PetContext.Provider
-      value={{ pets, selectedPetId, selectedPet, setSelectedPetId }}
+      value={{
+        pets,
+        selectedPetId,
+        selectedPet,
+        numberOfpets,
+        setSelectedPetId,
+      }}
     >
       {children}
     </PetContext.Provider>
