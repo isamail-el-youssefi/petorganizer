@@ -8,9 +8,13 @@ import { Textarea } from "./ui/textarea";
 
 type actionTypeProps = {
   actionType: "add" | "edit";
+  onFormSubmission: () => void;
 };
 
-export default function petForm({ actionType }: actionTypeProps) {
+export default function petForm({
+  actionType,
+  onFormSubmission,
+}: actionTypeProps) {
   // eslint-disable-next-line react-hooks/rules-of-hooks
   const { handleAddPet } = usePetContext();
 
@@ -29,6 +33,9 @@ export default function petForm({ actionType }: actionTypeProps) {
     };
     console.log(newPet);
     handleAddPet(newPet);
+
+    // to close the dialog after submitting
+    onFormSubmission();
   };
 
   return (
