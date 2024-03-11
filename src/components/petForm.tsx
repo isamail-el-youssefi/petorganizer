@@ -16,13 +16,13 @@ export default function petForm({
   onFormSubmission,
 }: actionTypeProps) {
   // eslint-disable-next-line react-hooks/rules-of-hooks
-  const { handleAddPet, selectedPet } = usePetContext();
+  const { handleAddPet, selectedPet, handleEditPet } = usePetContext();
 
   const handleSubmit = (e: React.FormEvent<HTMLFormElement>) => {
     e.preventDefault();
 
     const formData = new FormData(e.currentTarget);
-    const newPet = {
+    const addEditPet = {
       name: formData.get("name") as string,
       ownerName: formData.get("ownerName") as string,
       imageUrl:
@@ -31,8 +31,20 @@ export default function petForm({
       age: +(formData.get("age") as string),
       notes: formData.get("notes") as string,
     };
-    console.log(newPet);
-    handleAddPet(newPet);
+    console.log(addEditPet);
+    handleAddPet(addEditPet);
+
+    // {
+    //  actionType === "edit" ?
+    //      handleEditPet(selectedPet!.id, addEditPet)
+    //     : handleAddPet(addEditPet);
+    // }
+
+    if (actionType === "add") {
+      handleAddPet(addEditPet);
+    } else if (actionType === "edit") {
+      handleEditPet(selectedPet!.id, addEditPet);  // (!) is for telling typescript fuck off i know what i am doing 
+    }
 
     // to close the dialog after submitting
     onFormSubmission();

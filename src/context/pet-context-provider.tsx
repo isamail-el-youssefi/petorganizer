@@ -14,7 +14,8 @@ type PetContextType = {
   numberOfpets: number;
   setSelectedPetId: React.Dispatch<React.SetStateAction<string | null>>;
   handleCheckoutPet: (id: string) => void;
-  handleAddPet: (newPet: Pet) => void;
+  handleAddPet: (newPet: Omit<Pet, "id">) => void;
+  handleEditPet: (id: string, updatedPet: Omit<Pet, "id">) => void;
   selectedPet: Pet | undefined;
 };
 
@@ -32,9 +33,15 @@ export default function PetContextProvider({
   const numberOfpets = pets.length;
 
   // Event handlers / Actions
-  const handleAddPet = (newPet: Pet) => {
+  const handleAddPet = (newPet: Omit<Pet, "id">) => {
     const newPetWithId = { ...newPet, id: crypto.randomUUID() };
     setPets([...pets, newPetWithId]);
+  };
+
+  const handleEditPet = (petId: string, updatedPet: Omit<Pet, "id">) => {
+    setPets(
+      pets.map((pet) => (pet.id === petId ? { id: petId, ...updatedPet } : pet))
+    );
   };
 
   const handleCheckoutPet = (id: string) => {
@@ -50,6 +57,7 @@ export default function PetContextProvider({
         numberOfpets,
         setSelectedPetId,
         handleAddPet,
+        handleEditPet,
         handleCheckoutPet,
       }}
     >
