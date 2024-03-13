@@ -3,6 +3,7 @@ import { usePetContext } from "@/lib/hooks";
 import Image from "next/image";
 import PetButton from "./petButton";
 
+
 export default function PetDetails() {
   const { selectedPet, handleCheckoutPet } = usePetContext();
 
@@ -15,7 +16,7 @@ export default function PetDetails() {
           {/* Top bar */}
           <div className="flex items-center bg-white px-8 py-5 border-b border-light">
             <Image
-              src={selectedPet?.imageUrl}
+              src={selectedPet.imageUrl}
               alt="Selected pet image"
               height={75}
               width={75}
@@ -29,7 +30,9 @@ export default function PetDetails() {
               <PetButton actionType="edit">Edit</PetButton>
               <PetButton
                 actionType="checkout"
-                onClick={() => handleCheckoutPet(selectedPet.id)}
+                onClick={async () => {
+                  await handleCheckoutPet(selectedPet.id);
+                }}
               >
                 Checkout
               </PetButton>
