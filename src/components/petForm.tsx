@@ -7,6 +7,7 @@ import { Label } from "./ui/label";
 import { Textarea } from "./ui/textarea";
 import { addPet } from "@/actions/actions";
 import { useFormStatus } from "react-dom";
+import { toast } from "sonner";
 
 type actionTypeProps = {
   actionType: "add" | "edit";
@@ -55,7 +56,11 @@ export default function petForm({
   return (
     <form
       action={async (formData) => {
-        await addPet(formData);
+        const error = await addPet(formData);
+        if (error) {
+          toast(error.message);
+          return;
+        }
         onFormSubmission();
       }}
       className="flex flex-col"
