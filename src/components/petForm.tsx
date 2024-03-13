@@ -6,6 +6,7 @@ import { Input } from "./ui/input";
 import { Label } from "./ui/label";
 import { Textarea } from "./ui/textarea";
 import { addPet } from "@/actions/actions";
+import { useFormStatus } from "react-dom";
 
 type actionTypeProps = {
   actionType: "add" | "edit";
@@ -111,9 +112,24 @@ export default function petForm({
         </div>
       </div>
 
-      <Button type="submit" className="mt-6 px-20 py-5 self-end">
-        {actionType === "add" ? "Add a new pet" : "Edit pet"}
-      </Button>
+      <PetFormBtn actionType={actionType} />
     </form>
   );
 }
+
+type PetFormBtnProps = {
+  actionType: "add" | "edit";
+};
+
+const PetFormBtn = ({ actionType }: PetFormBtnProps) => {
+  const { pending } = useFormStatus();
+  return (
+    <Button
+      type="submit"
+      disabled={pending}
+      className="mt-6 px-20 py-5 self-end"
+    >
+      {actionType === "add" ? "Add a new pet" : "Edit pet"}
+    </Button>
+  );
+};
