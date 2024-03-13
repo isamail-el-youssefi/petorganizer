@@ -58,7 +58,7 @@ export default function petForm({
       action={async (formData) => {
         const error = await addPet(formData);
         if (error) {
-          toast(error.message);
+          toast.warning(error.message);
           return;
         }
         onFormSubmission();
