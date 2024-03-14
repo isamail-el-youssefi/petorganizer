@@ -5,9 +5,6 @@ import { Button } from "./ui/button";
 import { Input } from "./ui/input";
 import { Label } from "./ui/label";
 import { Textarea } from "./ui/textarea";
-import { addPet, editPet } from "@/actions/actions";
-import { useFormStatus } from "react-dom";
-import { toast } from "sonner";
 
 type actionTypeProps = {
   actionType: "add" | "edit";
@@ -141,11 +138,11 @@ type PetFormBtnProps = {
 };
 
 const PetFormBtn = ({ actionType }: PetFormBtnProps) => {
-  const { pending } = useFormStatus();
+  //const { pending } = useFormStatus(); //We dont need this anymore after using useOptimistic
   return (
     <Button
       type="submit"
-      disabled={pending}
+      //disabled={pending}
       className="mt-6 px-20 py-5 self-end"
     >
       {actionType === "add" ? "Add a new pet" : "Edit pet"}
