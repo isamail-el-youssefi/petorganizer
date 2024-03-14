@@ -28,9 +28,26 @@ export default function PetContextProvider({
   children,
 }: PetContextProviderProps) {
   //const [pets, setPets] = useState(pet);
-  const [optimicPets, setOptimisticPets] = useOptimistic(pets, (state, newPet) => {
-    return [...state, {...newPet, id: `${newPet.name}-${Date.now()}`}];
-  });
+  const [optimicPets, setOptimisticPets] = useOptimistic(
+    pets,
+    (state, { action, payload }) => {
+      switch (action) {
+        case "add":
+          return [...state, { ...payload, id: Date.now().toString() }];
+        case "edit":
+          return state.map((pet) => {
+            if (pet.id === payload.id) {
+              return { ...pet, ...payload.updatedPet };
+            }
+            return pet;
+          });
+        case "delete":
+          return state.filter((pet) => pet.id !== payload);
+        default:
+          return state;
+      }
+    }
+  );
   const [selectedPetId, setSelectedPetId] = useState<string | null>(null);
 
   // Derived state
@@ -41,7 +58,7 @@ export default function PetContextProvider({
   const handleAddPet = async (newPet: Omit<Pet, "id">) => {
     /*     const newPetWithId = { ...newPet, id: crypto.randomUUID() };
     setPets([...pets, newPetWithId]); */
-    setOptimisticPets(newPet);
+    setOptimisticPets({ action: "add", payload: newPet });
     const error = await addPet(newPet);
     if (error) {
       toast.warning(error.message);
@@ -55,6 +72,8 @@ export default function PetContextProvider({
     /*     setPets(
       pets.map((pet) => (pet.id === petId ? { id: petId, ...updatedPet } : pet))
     ); */
+    setOptimisticPets({ action: "edit", payload: { id: petId, updatedPet }});
+
     const error = await editPet(petId, updatedPet);
     if (error) {
       toast.warning(error.message);
@@ -66,6 +85,7 @@ export default function PetContextProvider({
 
   const handleCheckoutPet = async (petId: string) => {
     //setPets(pets.filter((pet) => pet.id !== id));
+    setOptimisticPets({ action: "delete", payload: petId });
     await deletePet(petId);
     toast.success("Pet deleted successfully");
   };
