@@ -14,14 +14,6 @@ type actionTypeProps = {
   onFormSubmission: () => void;
 };
 
-type PetFormType = {
-  name: string;
-  ownerName: string;
-  imageUrl: string;
-  age: number;
-  notes: string;
-};
-
 const petFormSchema = z.object({
   name: z.string().trim().min(1, "Name is required").max(50, "Too long"),
   ownerName: z
@@ -36,6 +28,9 @@ const petFormSchema = z.object({
   age: z.coerce.number().int().positive().max(999),
   notes: z.string().trim().max(1000, "Too long").optional(),
 });
+
+// taking typescript type from zod
+type PetFormType = z.infer<typeof petFormSchema>;
 
 export default function petForm({
   actionType,
