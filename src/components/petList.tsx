@@ -2,14 +2,19 @@
 import { usePetContext, useSearchContext } from "@/lib/hooks";
 import { cn } from "@/lib/utils";
 import Image from "next/image";
+import { useMemo } from "react";
 
 export default function PetList() {
   const { pets, setSelectedPetId, selectedPetId } = usePetContext();
   const { searchQuery } = useSearchContext();
 
   // Derived state
-  const filteredPets = pets.filter((pet) =>
-    pet.name.toLowerCase().includes(searchQuery.toLowerCase())
+  const filteredPets = useMemo(
+    () =>
+      pets.filter((pet) =>
+        pet.name.toLowerCase().includes(searchQuery.toLowerCase())
+      ),
+    [pets, searchQuery]
   );
 
   return (
