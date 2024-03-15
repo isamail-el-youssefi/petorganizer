@@ -6,6 +6,8 @@ import { Input } from "./ui/input";
 import { Label } from "./ui/label";
 import { Textarea } from "./ui/textarea";
 import { useForm } from "react-hook-form";
+import { z } from "zod";
+import { zodResolver } from "@hookform/resolvers/zod";
 
 type actionTypeProps = {
   actionType: "add" | "edit";
@@ -19,6 +21,21 @@ type PetFormType = {
   age: number;
   notes: string;
 };
+
+const petFormSchema = z.object({
+  name: z.string().trim().min(1, "Name is required").max(50, "Too long"),
+  ownerName: z
+    .string()
+    .trim()
+    .min(1, "Owner name is required")
+    .max(50, "Too long"),
+  imageUrl: z.union([
+    z.literal(""),
+    z.string().trim().url({ message: "Image url must be a valid url" }),
+  ]),
+  age: z.coerce.number().int().positive().max(999),
+  notes: z.string().trim().max(1000, "Too long").optional(),
+});
 
 export default function petForm({
   actionType,
@@ -63,12 +80,13 @@ export default function petForm({
     trigger,
     formState: { isSubmitting, errors },
     // eslint-disable-next-line react-hooks/rules-of-hooks
-  } = useForm<PetFormType>();
+  } = useForm<PetFormType>({
+    resolver: zodResolver(petFormSchema),
+  });
 
   return (
     <form
       action={async (formData) => {
-        
         const result = await trigger();
         //if the result not okay stop here and show the user where he did mistake errors formstate in useForm
         if (!result) return;
@@ -101,10 +119,7 @@ export default function petForm({
           <Label htmlFor="name">Name</Label>
           <Input
             id="name"
-            {...register("name", {
-              required: "Name is required",
-              maxLength: { value: 50, message: "Name is too long" },
-            })}
+            {...register("name")}
             defaultValue={actionType === "edit" ? selectedPet?.name : ""}
           />
           {errors.name && <p className="text-red-500">{errors.name.message}</p>}
