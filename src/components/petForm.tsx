@@ -6,31 +6,13 @@ import { Input } from "./ui/input";
 import { Label } from "./ui/label";
 import { Textarea } from "./ui/textarea";
 import { useForm } from "react-hook-form";
-import { z } from "zod";
 import { zodResolver } from "@hookform/resolvers/zod";
+import { PetFormType, petFormSchema } from "@/lib/validations";
 
 type actionTypeProps = {
   actionType: "add" | "edit";
   onFormSubmission: () => void;
 };
-
-const petFormSchema = z.object({
-  name: z.string().trim().min(1, "Name is required").max(50, "Too long"),
-  ownerName: z
-    .string()
-    .trim()
-    .min(1, "Owner name is required")
-    .max(50, "Too long"),
-  imageUrl: z.union([
-    z.literal(""),
-    z.string().trim().url({ message: "Image url must be a valid url" }),
-  ]),
-  age: z.coerce.number().int().positive().max(999),
-  notes: z.string().trim().max(1000, "Too long").optional(),
-});
-
-// taking typescript type from zod
-type PetFormType = z.infer<typeof petFormSchema>;
 
 export default function petForm({
   actionType,
@@ -73,30 +55,33 @@ export default function petForm({
   const {
     register,
     trigger,
+    getValues,
     formState: { isSubmitting, errors },
     // eslint-disable-next-line react-hooks/rules-of-hooks
   } = useForm<PetFormType>({
     resolver: zodResolver(petFormSchema),
+    defaultValues: {
+      name: selectedPet?.name || "",
+      ownerName: selectedPet?.ownerName || "",
+      imageUrl: selectedPet?.imageUrl || "",
+      age: selectedPet?.age || 0,
+      notes: selectedPet?.notes || "",
+    },
   });
 
   return (
     <form
-      action={async (formData) => {
+      action={async () => {
         const result = await trigger();
         //if the result not okay stop here and show the user where he did mistake errors formstate in useForm
         if (!result) return;
 
         onFormSubmission();
 
-        const petData = {
-          name: formData.get("name") as string,
-          ownerName: formData.get("ownerName") as string,
-          imageUrl:
-            (formData.get("imageUrl") as string) ||
-            "https://bytegrad.com/course-assets/react-nextjs/pet-placeholder.png",
-          age: Number(formData.get("age")),
-          notes: formData.get("notes") as string,
-        };
+        const petData = getValues();
+        petData.imageUrl =
+          petData.imageUrl ||
+          "https://bytegrad.com/course-assets/react-nextjs/pet-placeholder.png";
 
         //ADD
         if (actionType === "add") {
@@ -115,7 +100,7 @@ export default function petForm({
           <Input
             id="name"
             {...register("name")}
-            defaultValue={actionType === "edit" ? selectedPet?.name : ""}
+            //defaultValue={actionType === "edit" ? selectedPet?.name : ""}
           />
           {errors.name && <p className="text-red-500">{errors.name.message}</p>}
         </div>
@@ -124,7 +109,7 @@ export default function petForm({
           <Input
             id="ownerName"
             {...register("ownerName")}
-            defaultValue={actionType === "edit" ? selectedPet?.ownerName : ""}
+            //defaultValue={actionType === "edit" ? selectedPet?.ownerName : ""}
           />
           {errors.ownerName && (
             <p className="text-red-500">{errors.ownerName.message}</p>
@@ -135,7 +120,7 @@ export default function petForm({
           <Input
             id="imageUrl"
             {...register("imageUrl")}
-            defaultValue={actionType === "edit" ? selectedPet?.imageUrl : ""}
+            //defaultValue={actionType === "edit" ? selectedPet?.imageUrl : ""}
           />
           {errors.imageUrl && (
             <p className="text-red-500">{errors.imageUrl.message}</p>
@@ -146,7 +131,7 @@ export default function petForm({
           <Input
             id="age"
             {...register("age")}
-            defaultValue={actionType === "edit" ? selectedPet?.age : ""}
+            //defaultValue={actionType === "edit" ? selectedPet?.age : ""}
           />
           {errors.age && <p className="text-red-500">{errors.age.message}</p>}
         </div>
@@ -155,7 +140,7 @@ export default function petForm({
           <Textarea
             id="notes"
             {...register("notes")}
-            defaultValue={actionType === "edit" ? selectedPet?.notes : ""}
+            //defaultValue={actionType === "edit" ? selectedPet?.notes : ""}
           />
           {errors.notes && (
             <p className="text-red-500">{errors.notes.message}</p>
