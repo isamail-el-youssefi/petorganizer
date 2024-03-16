@@ -11,13 +11,24 @@ datasource db {
 }
 
 
+model User {
+  id    Int    @id @default(autoincrement())
+  email String @unique
+  hashedPassword String
+  pets      Pet[]
+  updatedAt DateTime @updatedAt
+  createdAt DateTime @default(now())
+}
+
 model Pet {
-  id        Int    @id @default(autoincrement())
+  id        Int     @id @default(autoincrement())
   name      String
   ownerName String
   imageUrl  String
   age       Int
   notes     String
+  User      User    @relation(fields: [userId], references: [id])
+  userId    Int
   updatedAt DateTime @updatedAt
   createdAt DateTime @default(now())
 }
