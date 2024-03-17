@@ -6,7 +6,7 @@ export default function page() {
   return (
     <main>
       <H1 className="text-center">Log in</H1>
-      <AuthForm />
+      <AuthForm type="login" />
       <p className="mt-6 text-sm text-zinc-500">
         No account yet?{" "}
         <Link href="/signup" className="font-medium">
