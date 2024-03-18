@@ -1,6 +1,6 @@
 "use server";
 
-import { signIn } from "@/lib/auth";
+import { signIn, signOut } from "@/lib/auth";
 import prisma from "@/lib/db";
 import { PetEssentials } from "@/lib/types";
 import { sleep } from "@/lib/utils";
@@ -18,6 +18,11 @@ export async function logIn(formData: FormData) {
   const authData = Object.fromEntries(formData.entries());
 
   await signIn("credentials", authData);
+}
+
+// Destroy the cookie
+export async function logOut() {
+  await signOut({redirectTo: "/"});
 }
 
 // --- pet actions ---
