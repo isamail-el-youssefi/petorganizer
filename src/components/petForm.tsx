@@ -60,13 +60,16 @@ export default function petForm({
     // eslint-disable-next-line react-hooks/rules-of-hooks
   } = useForm<PetFormType>({
     resolver: zodResolver(petFormSchema),
-    defaultValues: {
-      name: selectedPet?.name || "",
-      ownerName: selectedPet?.ownerName || "",
-      imageUrl: selectedPet?.imageUrl || "",
-      age: selectedPet?.age || 0,
-      notes: selectedPet?.notes || "",
-    },
+    defaultValues:
+      actionType === "edit"
+        ? {
+            name: selectedPet?.name || "",
+            ownerName: selectedPet?.ownerName || "",
+            imageUrl: selectedPet?.imageUrl || "",
+            age: selectedPet?.age || 0,
+            notes: selectedPet?.notes || "",
+          }
+        : undefined,
   });
 
   return (

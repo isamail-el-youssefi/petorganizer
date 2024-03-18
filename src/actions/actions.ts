@@ -7,7 +7,7 @@ import { sleep } from "@/lib/utils";
 import { petFormSchema } from "@/lib/validations";
 import { Pet } from "@prisma/client";
 import { revalidatePath } from "next/cache";
-import { redirect } from "next/navigation";
+import bcrypt from "bcryptjs";
 
 // --- user actions ---
 
@@ -16,14 +16,29 @@ export async function logIn(formData: FormData) {
   //  email: formData.get("email"),
   //  password: formData.get("password")
   //}
-  const authData = Object.fromEntries(formData.entries());
+  //const authData = Object.fromEntries(formData.entries());
+  await signIn("credentials", formData);
+}
 
-  await signIn("credentials", authData);
+export async function register(formData: FormData) {
+  const hashedPassword = await bcrypt.hash(
+    formData.get("password") as string,
+    10
+  );
+
+  await prisma.user.create({
+    data: {
+      email: formData.get("email") as string,
+      hashedPassword,
+    },
+  });
+
+  await signIn("credentials", formData);
 }
 
 // Destroy the cookie
 export async function logOut() {
-  await signOut({redirectTo: "/"});
+  await signOut({ redirectTo: "/" });
 }
 
 // --- pet actions ---
@@ -41,7 +56,8 @@ export async function addPet(pet: PetEssentials) {
       data: validatedPet.data,
     });
   } catch (error) {
-    return { message: "Could not add pet" };
+    //return { message: error };
+    throw new Error(error);
   }
 
   revalidatePath("/app", "layout");
