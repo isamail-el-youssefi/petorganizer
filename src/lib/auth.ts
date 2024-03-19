@@ -71,7 +71,7 @@ const config = {
     session: ({ session, token }) => {
       // on every request (grabing the id from the token to the session, bz the id in the jwt callback is encrypted
       // we cant access it so thats why we passing the id to the session to be consummed in the client)
-      if (session) {
+      if (session.user) {
         session.user.id = token.userId;
       }
 
