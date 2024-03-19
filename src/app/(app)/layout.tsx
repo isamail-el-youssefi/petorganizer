@@ -18,10 +18,11 @@ export default async function Layout({ children }: LayoutProps) {
   );
   if (!res.ok) throw new Error("Failed to fetch data");
   const pets: Pet[] = await res.json(); */
-
+  // first chicking if the user is logged in
   const session = await auth();
   if (!session?.user) redirect("login");
-
+  
+  // then display pets for the specific user
   const pets = await prisma.pet.findMany({
     where: { userId: session.user.id },
   });

@@ -1,6 +1,6 @@
 "use server";
 
-import { signIn, signOut } from "@/lib/auth";
+import { auth, signIn, signOut } from "@/lib/auth";
 import prisma from "@/lib/db";
 import { PetEssentials } from "@/lib/types";
 import { sleep } from "@/lib/utils";
@@ -8,6 +8,7 @@ import { petFormSchema } from "@/lib/validations";
 import { Pet } from "@prisma/client";
 import { revalidatePath } from "next/cache";
 import bcrypt from "bcryptjs";
+import { redirect } from "next/navigation";
 
 // --- user actions ---
 
@@ -46,6 +47,10 @@ export async function logOut() {
 export async function addPet(pet: PetEssentials) {
   await sleep(500);
 
+  // first chicking if the user is logged in
+  const session = await auth();
+  if (!session?.user) redirect("login");
+
   const validatedPet = petFormSchema.safeParse(pet); // validate the data
   if (!validatedPet.success) {
     return { message: "Invalid pet data" };
@@ -53,7 +58,11 @@ export async function addPet(pet: PetEssentials) {
 
   try {
     await prisma.pet.create({
-      data: validatedPet.data,
+      data: {...validatedPet.data, User:{
+        connect: {
+          id: session.user.id
+        }
+      }}
     });
   } catch (error) {
     //return { message: error };

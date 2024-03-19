@@ -65,6 +65,7 @@ const config = {
       if (user) {
         // on sign in (grabing id from the user to the token)
         token.userId = user.id;
+        console.log("user",user)
       }
       return token;
     },
@@ -74,6 +75,7 @@ const config = {
       if (session.user) {
         session.user.id = token.userId;
       }
+      console.log("session",session.user); 
 
       return session;
     },
