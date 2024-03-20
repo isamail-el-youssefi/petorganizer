@@ -80,14 +80,33 @@ export async function addPet(pet: PetEssentials) {
 export async function editPet(petId: Pet["id"], newPetData: PetEssentials) {
   await sleep(500);
 
+  // authentification
+  const session = await auth();
+  if (!session?.user) redirect("login");
+
+  // validation
+  const validatedPetId = petIdSchema.safeParse(petId);
   const validatedNewPet = petFormSchema.safeParse(newPetData); // validate the data
-  if (!validatedNewPet.success) {
+  if (!validatedNewPet.success || !validatedPetId.success) {
     return { message: "Invalid pet data" };
   }
 
+  // authorization check
+  const pet = await prisma.pet.findUnique({
+    where: { id: validatedPetId.data },
+    select: { userId: true },
+  });
+  if (!pet) {
+    return { message: "Pet not found" };
+  }
+  if (pet?.userId !== session.user.id) {
+    return { message: "You are not authorized to edit this pet" };
+  }
+
+  //?? database mutation
   try {
     await prisma.pet.update({
-      where: { id: petId },
+      where: { id: validatedPetId.data },
       data: validatedNewPet.data,
     });
   } catch (error) {
@@ -121,6 +140,9 @@ export async function deletePet(petId: Pet["id"]) {
       userId: true,
     },
   });
+  if (!pet) {
+    return { message: "Pet not found" };
+  }
   if (pet.userId !== session.user.id) {
     return {
       message: "You are not authorised to delete this pet",
