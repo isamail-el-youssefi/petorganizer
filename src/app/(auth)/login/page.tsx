@@ -8,7 +8,7 @@ export default function page() {
       <H1 className="text-center">Log in</H1>
       <AuthForm type="login" />
       <p className="mt-6 text-sm text-zinc-500">
-        No account yet?{" "}
+        No account yet?
         <Link href="/signup" className="font-medium">
           Sign up
         </Link>

@@ -1,6 +1,6 @@
 import { z } from "zod";
 
-export const petIdSchema = z.number().int().positive();
+export const petIdSchema = z.string().cuid();
 
 export const petFormSchema = z
   .object({
@@ -26,3 +26,8 @@ export const petFormSchema = z
 
 // taking typescript type from zod
 export type PetFormType = z.infer<typeof petFormSchema>;
+
+export const authSchema = z.object({
+  email: z.string().email().max(50),
+  password: z.string().max(50),
+});

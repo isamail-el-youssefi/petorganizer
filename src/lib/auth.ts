@@ -1,18 +1,28 @@
-import NextAuth, { NextAuthConfig } from "next-auth";
-import credentials from "next-auth/providers/credentials";
+import NextAuth, { NextAuthConfig, User } from "next-auth";
+import Credentials from "next-auth/providers/credentials";
 import prisma from "./db";
 import bcrypt from "bcryptjs";
+import { authSchema } from "./validations";
 
 const config = {
   pages: {
     signIn: "/login",
   },
   providers: [
-    credentials({
+    Credentials({
       async authorize(credentials) {
         // runs on every login attempt
-        const { email, password } = credentials;
 
+        // validation
+        const validatedCredentials = authSchema.safeParse(credentials);
+        if (!validatedCredentials.success) {
+          return null;
+        }
+
+        // extract values
+        const { email, password } = validatedCredentials.data;
+
+        // check if user exists
         const user = await prisma.user.findUnique({
           where: {
             email,
@@ -65,7 +75,7 @@ const config = {
       if (user) {
         // on sign in (grabing id from the user to the token)
         token.userId = user.id;
-        console.log("user",user)
+        console.log("user", user);
       }
       return token;
     },
@@ -75,7 +85,7 @@ const config = {
       if (session.user) {
         session.user.id = token.userId;
       }
-      console.log("session",session.user); 
+      console.log("session", session.user);
 
       return session;
     },

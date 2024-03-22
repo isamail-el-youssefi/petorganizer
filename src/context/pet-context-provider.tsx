@@ -13,10 +13,10 @@ type PetContextProviderProps = {
 
 type PetContextType = {
   pets: Pet[];
-  selectedPetId: number | null;
+  selectedPetId: string | null;
   selectedPet: Pet | undefined;
   numberOfpets: number;
-  setSelectedPetId: React.Dispatch<React.SetStateAction<number | null>>;
+  setSelectedPetId: React.Dispatch<React.SetStateAction<string | null>>;
   handleCheckoutPet: (id: Pet["id"]) => Promise<void>;
   handleAddPet: (newPet: PetEssentials) => Promise<void>;
   handleEditPet: (id: Pet["id"], updatedPet: PetEssentials) => Promise<void>;
@@ -49,7 +49,7 @@ export default function PetContextProvider({
       }
     }
   );
-  const [selectedPetId, setSelectedPetId] = useState<number | null>(null);
+  const [selectedPetId, setSelectedPetId] = useState<string | null>(null);
 
   // Derived state
   const selectedPet = optimicPets.find((pet) => pet.id === selectedPetId);
@@ -84,7 +84,7 @@ export default function PetContextProvider({
     }
   };
 
-  const handleCheckoutPet = async (petId: number) => {
+  const handleCheckoutPet = async (petId: string) => {
     //setPets(pets.filter((pet) => pet.id !== id));
     setOptimisticPets({ action: "delete", payload: petId });
     await deletePet(petId);

@@ -1,4 +1,4 @@
-"use server";
+/* "use server";
 
 import { auth, signIn, signOut } from "@/lib/auth";
 import prisma from "@/lib/db";
@@ -162,4 +162,189 @@ export async function deletePet(petId: Pet["id"]) {
     };
   }
   revalidatePath("/app", "layout");
+} */
+
+"use server";
+
+import { auth, signIn, signOut } from "@/lib/auth";
+import prisma from "@/lib/db";
+import { PetEssentials } from "@/lib/types";
+import { sleep } from "@/lib/utils";
+import { authSchema, petFormSchema, petIdSchema } from "@/lib/validations";
+import { Pet } from "@prisma/client";
+import { revalidatePath } from "next/cache";
+import bcrypt from "bcryptjs";
+import { redirect } from "next/navigation";
+
+//?? --- user actions --- ??//
+
+//!! User Login
+export async function logIn(formData: FormData) {
+  // check if formData is a FormData type
+  if (!(formData instanceof FormData)) {
+    return {
+      message: "Invalid form data",
+    };
+  }
+
+  await signIn("credentials", formData);
 }
+
+//!! User Register
+export async function register(formData: unknown) {
+  // check if formData is FormData type
+  if (!(formData instanceof FormData)) {
+    return {
+      message: "Invalid form data",
+    };
+  }
+
+  // convert formData to a plain object (bz of zod z.obj)
+  const formDataObj = Object.fromEntries(formData.entries());
+
+  // validation
+  const validateFormData = authSchema.safeParse(formDataObj);
+  if (!validateFormData.success) {
+    return {
+      message: "Invalid form data",
+    };
+  }
+
+  const hashedPassword = await bcrypt.hash(validateFormData.data.password, 10);
+
+  await prisma.user.create({
+    data: {
+      email: validateFormData.data.email,
+      hashedPassword,
+    },
+  });
+
+  await signIn("credentials", formData);
+}
+
+//!! User LogOut (destroy cookie)
+export async function logOut() {
+  await signOut({ redirectTo: "/" });
+}
+
+//?? --- pet actions --- ??//
+
+//!! Add Pet Action
+export async function addPet(pet: PetEssentials) {
+  await sleep(500);
+
+  // first chicking if the user is logged in
+  const session = await auth();
+  if (!session?.user) redirect("login");
+
+  const validatedPet = petFormSchema.safeParse(pet); // validate the data
+  if (!validatedPet.success) {
+    return { message: "Invalid pet data" };
+  }
+
+  try {
+    await prisma.pet.create({
+      data: {
+        ...validatedPet.data,
+        User: {
+          connect: {
+            id: session.user.id,
+          },
+        },
+      },
+    });
+  } catch (error) {
+    return { message: error };
+  }
+
+  revalidatePath("/app", "layout");
+}
+
+//!! Update Pet Action
+export async function editPet(petId: Pet["id"], newPetData: PetEssentials) {
+  await sleep(500);
+
+  // authentification
+  const session = await auth();
+  if (!session?.user) redirect("login");
+
+  // validation
+  const validatedPetId = petIdSchema.safeParse(petId);
+  const validatedNewPet = petFormSchema.safeParse(newPetData); // validate the data
+  if (!validatedNewPet.success || !validatedPetId.success) {
+    return { message: "Invalid pet data" };
+  }
+
+  // authorization check
+  const pet = await prisma.pet.findUnique({
+    where: { id: validatedPetId.data },
+    select: { userId: true },
+  });
+  if (!pet) {
+    return { message: "Pet not found" };
+  }
+  if (pet?.userId !== session.user.id) {
+    return { message: "You are not authorized to edit this pet" };
+  }
+
+  // database mutation
+  try {
+    await prisma.pet.update({
+      where: { id: validatedPetId.data },
+      data: validatedNewPet.data,
+    });
+  } catch (error) {
+    return {
+      message: "Could not edit pet",
+    };
+  }
+  revalidatePath("/app", "layout");
+}
+
+//!! Delete Pet Action
+export async function deletePet(petId: Pet["id"]) {
+  await sleep(500);
+
+  // authentication check
+  const session = await auth();
+  if (!session?.user) redirect("login");
+
+  // validation
+  const validatedPetId = petIdSchema.safeParse(petId);
+  if (!validatedPetId.success) {
+    return { message: "Invalid pet data" };
+  }
+
+  // authorisation check
+  const pet = await prisma.pet.findUnique({
+    where: {
+      id: validatedPetId.data,
+    },
+    select: {
+      userId: true,
+    },
+  });
+  if (!pet) {
+    return { message: "Pet not found" };
+  }
+  if (pet.userId !== session.user.id) {
+    return {
+      message: "You are not authorised to delete this pet",
+    };
+  }
+
+  // database mutation
+  try {
+    await prisma.pet.delete({
+      where: {
+        id: validatedPetId.data,
+      },
+    });
+  } catch {
+    return {
+      message: "Could not delete pet",
+    };
+  }
+  revalidatePath("/app", "layout");
+}
+ 
