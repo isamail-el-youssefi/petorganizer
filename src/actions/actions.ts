@@ -171,7 +171,7 @@ import prisma from "@/lib/db";
 import { PetEssentials } from "@/lib/types";
 import { sleep } from "@/lib/utils";
 import { authSchema, petFormSchema, petIdSchema } from "@/lib/validations";
-import { Pet } from "@prisma/client";
+import { Pet, Prisma } from "@prisma/client";
 import { revalidatePath } from "next/cache";
 import bcrypt from "bcryptjs";
 import { redirect } from "next/navigation";
@@ -212,12 +212,25 @@ export async function register(formData: unknown) {
 
   const hashedPassword = await bcrypt.hash(validateFormData.data.password, 10);
 
-  await prisma.user.create({
-    data: {
-      email: validateFormData.data.email,
-      hashedPassword,
-    },
-  });
+  try {
+    await prisma.user.create({
+      data: {
+        email: validateFormData.data.email,
+        hashedPassword,
+      },
+    });
+  } catch (error) {
+    if (error instanceof Prisma.PrismaClientKnownRequestError) {
+      if (error.code === "P2002") {
+        return {
+          message: "Email already exists",
+        };
+      }
+    }
+    return {
+      message: "Could not create user",
+    };
+  }
 
   await signIn("credentials", formData);
 }
@@ -347,4 +360,3 @@ export async function deletePet(petId: Pet["id"]) {
   }
   revalidatePath("/app", "layout");
 }
- 
