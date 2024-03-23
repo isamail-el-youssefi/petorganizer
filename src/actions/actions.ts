@@ -183,7 +183,7 @@ import { AuthError } from "next-auth";
 // prevState prop is just for useFormState for handling error in the authForm
 // component to work properly
 export async function logIn(prevState: unknown, formData: FormData) {
-  sleep(1000);
+  await sleep(1000);
 
   // check if formData is a FormData type
   if (!(formData instanceof FormData)) {
@@ -261,6 +261,7 @@ export async function register(prevState: unknown, formData: unknown) {
 
 //!! User LogOut (destroy cookie)
 export async function logOut() {
+  await sleep(1000);
   await signOut({ redirectTo: "/" });
 }
 
