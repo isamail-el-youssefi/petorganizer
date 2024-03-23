@@ -180,6 +180,8 @@ import { redirect } from "next/navigation";
 
 //!! User Login
 export async function logIn(formData: FormData) {
+  sleep(1000)
+
   // check if formData is a FormData type
   if (!(formData instanceof FormData)) {
     return {

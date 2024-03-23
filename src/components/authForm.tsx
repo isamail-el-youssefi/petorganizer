@@ -2,9 +2,10 @@ import { logIn, register } from "@/actions/actions";
 import { Button } from "./ui/button";
 import { Input } from "./ui/input";
 import { Label } from "./ui/label";
+import AuthFormBtn from "./authFormBtn";
 
 type authFormProps = {
-  type: "login" | "register";
+  type: "login" | "Sign up";
 };
 
 export default function AuthForm({ type }: authFormProps) {
@@ -26,7 +27,7 @@ export default function AuthForm({ type }: authFormProps) {
         />
       </div>
 
-      <Button>{type === "login" ? "Log in" : "Sign up"}</Button>
+      <AuthFormBtn type={type} />
     </form>
   );
 }
