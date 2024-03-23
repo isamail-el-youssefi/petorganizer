@@ -209,6 +209,8 @@ export async function logIn(prevState: unknown, formData: FormData) {
         }
       }
     }
+
+    throw error; // nextjs redirects throws error, so we need to rethrow it
   }
 }
 
