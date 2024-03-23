@@ -53,6 +53,8 @@ export default function PetContextProvider({
 
   // Derived state
   const selectedPet = optimicPets.find((pet) => pet.id === selectedPetId);
+  const selectLastPet = () =>
+    setSelectedPetId(optimicPets[numberOfpets - 1].id);
   const numberOfpets = optimicPets.length;
 
   // Event handlers / Actions
@@ -67,6 +69,7 @@ export default function PetContextProvider({
     } else {
       toast.success("Pet added successfully");
     }
+    selectLastPet;
   };
 
   const handleEditPet = async (petId: Pet["id"], updatedPet: PetEssentials) => {

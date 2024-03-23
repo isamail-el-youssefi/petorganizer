@@ -175,12 +175,15 @@ import { Pet, Prisma } from "@prisma/client";
 import { revalidatePath } from "next/cache";
 import bcrypt from "bcryptjs";
 import { redirect } from "next/navigation";
+import { AuthError } from "next-auth";
 
 //?? --- user actions --- ??//
 
 //!! User Login
-export async function logIn(formData: FormData) {
-  sleep(1000)
+// prevState prop is just for useFormState for handling error in the authForm
+// component to work properly
+export async function logIn(prevState: unknown, formData: FormData) {
+  sleep(1000);
 
   // check if formData is a FormData type
   if (!(formData instanceof FormData)) {
@@ -189,11 +192,28 @@ export async function logIn(formData: FormData) {
     };
   }
 
-  await signIn("credentials", formData);
+  try {
+    await signIn("credentials", formData);
+  } catch (error) {
+    if (error instanceof AuthError) {
+      switch (error.type) {
+        case "CredentialsSignin": {
+          return {
+            message: "Invalid email or password",
+          };
+        }
+        default: {
+          return {
+            message: "Could not sign in",
+          };
+        }
+      }
+    }
+  }
 }
 
 //!! User Register
-export async function register(formData: unknown) {
+export async function register(prevState: unknown, formData: unknown) {
   // check if formData is FormData type
   if (!(formData instanceof FormData)) {
     return {
