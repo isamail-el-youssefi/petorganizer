@@ -64,7 +64,7 @@ export default function PetContextProvider({
     setOptimisticPets({ action: "add", payload: newPet });
     const error = await addPet(newPet);
     if (error) {
-      toast.warning(error.message);
+      toast.warning("Error adding pet");
       return;
     } else {
       toast.success("Pet added successfully");
