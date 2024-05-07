@@ -182,7 +182,7 @@ import { AuthError } from "next-auth";
 //!! User Login
 // prevState prop is just for useFormState for handling error in the authForm
 // component to work properly
-export async function logIn(prevState: unknown, formData: FormData) {
+export async function logIn(prevState: unknown, formData: unknown) {
 
   // check if formData is a FormData type
   if (!(formData instanceof FormData)) {
