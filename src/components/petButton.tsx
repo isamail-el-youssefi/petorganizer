@@ -37,11 +37,11 @@ export default function PetButton({
       <Dialog open={isFormOpen} onOpenChange={setIsFormOpen}>
         <DialogTrigger asChild>
           {actionType === "add" ? (
-            <Button size="icon">
-              <PlusIcon className="h-5 w-5" />
+            <Button className="bg-[#383131]" size="icon">
+              <PlusIcon className="h-5 w-5 " />
             </Button>
           ) : (
-            <Button variant="secondary">{children}</Button>
+            <Button  variant="secondary">{children}</Button>
           )}
         </DialogTrigger>
 

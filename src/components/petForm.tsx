@@ -8,18 +8,26 @@ import { Textarea } from "./ui/textarea";
 import { useForm } from "react-hook-form";
 import { zodResolver } from "@hookform/resolvers/zod";
 import { PetFormType, petFormSchema } from "@/lib/validations";
+import { Pet } from "@prisma/client";
+import { PetEssentials } from "@/lib/types";
 
 type actionTypeProps = {
   actionType: "add" | "edit";
   onFormSubmission: () => void;
 };
 
-export default function petForm({
+type PetContextType = {
+  selectedPet: Pet | undefined;
+  handleAddPet: (newPet: PetEssentials) => Promise<void>;
+  handleEditPet: (id: Pet["id"], updatedPet: PetEssentials) => Promise<void>;
+};
+
+export default function PetForm({
   actionType,
   onFormSubmission,
 }: actionTypeProps) {
-  // eslint-disable-next-line react-hooks/rules-of-hooks
-  const { handleAddPet, selectedPet, handleEditPet } = usePetContext();
+  const { handleAddPet, selectedPet, handleEditPet }: PetContextType =
+    usePetContext();
   /*   const handleSubmit = (e: React.FormEvent<HTMLFormElement>) => {
     e.preventDefault();
 
@@ -166,7 +174,7 @@ const PetFormBtn = ({ actionType }: PetFormBtnProps) => {
     <Button
       type="submit"
       //disabled={pending}
-      className="mt-6 px-20 py-5 self-end"
+      className="mt-6 px-20 py-5 self-end bg-[#383131]"
     >
       {actionType === "add" ? "Add a new pet" : "Edit pet"}
     </Button>

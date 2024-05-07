@@ -5,7 +5,7 @@ import Link from "next/link";
 
 export default function Home() {
   return (
-    <main className="bg-[#5DC9A8] min-h-screen flex flex-col xl:flex-row items-center justify-center gap-10">
+    <main className="bg-[#645555]/70 min-h-screen flex flex-col xl:flex-row items-center justify-center gap-10">
       <Image
         src="https://bytegrad.com/course-assets/react-nextjs/petsoft-preview.png"
         alt="Preview of PetSoft"
@@ -20,8 +20,8 @@ export default function Home() {
           ease
         </h1>
         <p className="text-2xl font-medium max-w-[600px]">
-          Use PetSoft to easily keep track of pets under your care. Get lifetime
-          access for $299.
+          Use PetCare to easily keep track of pets under your care. Get lifetime
+          access for FREE.
         </p>
         <div className="mt-10 space-x-3">
           <Button asChild>
